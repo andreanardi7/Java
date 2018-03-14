@@ -9,7 +9,7 @@ public class Server {
     Socket socketClient = null;
 
     int porta = 7777;
-    String letto;
+    String letto, risposta;
 
     DataInputStream in;
     DataOutputStream out;
@@ -19,28 +19,27 @@ public class Server {
 
             System.out.println("Aspetto un messaggio dal client...");
             letto = in.readLine();
+            risposta = letto;
+            if ("meme" == letto) {
+                risposta = "Sei un memino";
+                System.out.println("Sei un memino");
+            } else {
+                if ("errore qualsiasi" == letto) {
+                    risposta = "Non fotti con me bro";
+                    System.out.println("Non fotti con me bro");
+                } else {
+                    risposta = "Questo server è inutile cosa pensavi di fare \nConnessione terminata";
+                    System.out.println("Questo server è inutile cosa pensavi di fare \nConnessione terminata");
+                }
+
+                out.writeBytes(risposta + "\n");
+                System.out.println("Il server risponde: " + risposta);
+                socketClient.close();
+            }
             System.out.println("Messaggio ricevuto correttamente");
 
-            if("meme".equals(letto)) {
-                    letto = "Sei un memino";
-                    System.out.println("Sei un memino");
-            }else{
-                if("errore qualsiasi".equals(letto)) {
-                    letto = "Non fotti con me bro";
-                    System.out.println("Non fotti con me bro");
-                }
-            else {
-                letto = "Questo server è inutile cosa pensavi di fare \nConnessione terminata";
-                System.out.println("Questo server è inutile cosa pensavi di fare \nConnessione terminata");
-            }
-
-            out.writeBytes(letto + "\n");
-            System.out.println("Il server risponde: " + letto);
-            socketClient.close();
-            }
-            
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("Errore nella trasmissione");
         }
     }

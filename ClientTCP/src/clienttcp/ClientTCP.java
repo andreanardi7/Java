@@ -31,7 +31,7 @@ class ClientTCP {
 
     }
 
-    public void connetti() {
+    public boolean connetti() {
         try {
 
             System.out.println("Test di connessione...");
@@ -41,18 +41,21 @@ class ClientTCP {
 
             in = new DataInputStream(clientUno.getInputStream());
             out = new DataOutputStream(clientUno.getOutputStream());
+            return true;
 
         } catch (ConnectException connExc) {
             System.err.println("Host non trovato");
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            System.err.println("Connessione non riuscita");
+            return false;
         }
-
-    }
+}
 
     public static void main(String[] args) {
         ClientTCP c = new ClientTCP();
-        c.connetti();
-        c.Comunica();
+        if(c.connetti()==true){
+            c.Comunica();
+        }
     }
 }
