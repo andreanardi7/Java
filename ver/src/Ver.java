@@ -1,13 +1,13 @@
+import static java.lang.Thread.State.WAITING;
 import java.util.concurrent.Semaphore;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 class bus {
 
     static Semaphore postiBus = new Semaphore(10);
 
     static class StatoPosti implements Runnable {
-
-        private final Random rand = new Random();
 
         @Override
         public void run() {
@@ -18,39 +18,39 @@ class bus {
         }
 
         private void Gestioneposti() {
+                Random rand = new Random();
             try {
-                Thread.sleep(rand.nextInt(6)*10000);
+                TimeUnit.SECONDS.sleep(60);
             } catch (InterruptedException e) {
             }
         }
 
     }
-
+    
+    private static void RicercaPosti() {
+        try {
+            Thread.currentThread().join();
+        } catch (InterruptedException e) {
+        }
+    }
+    
     static class Write implements Runnable {
-
-        private final Random rand = new Random();
 
         @Override
         public void run() {
             try {
+                RicercaPosti();
                 postiBus.acquire();
                 System.out.println("Thread " + Thread.currentThread().getName() + " è salito sul bus");
-                OccupatorePosti();
-                System.out.println("Thread " + Thread.currentThread().getName() + " è sceso dal bus");
+                
                 postiBus.release();
+                System.out.println("Thread " + Thread.currentThread().getName() + " è sceso dal bus");
             } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
             }
         }
     }
 
-    private static void OccupatorePosti() {
-        Random rand = new Random();
-        try {
-            Thread.sleep(rand.nextInt(5)*10000);
-        } catch (InterruptedException e) {
-        }
-    }
 
     public static void main(String[] args) throws Exception {
         Random rand = new Random();
@@ -77,27 +77,28 @@ class bus {
         Thread p10 = new Thread(write);
         p10.setName("persona10");
         p1.start();
-	p1.join(rand.nextInt(5)*10000);
         p2.start();
-	p2.join(rand.nextInt(5)*10000);
         p3.start();
-	p3.join(rand.nextInt(5)*10000);
         p4.start();
-	p4.join(rand.nextInt(5)*10000);
         p5.start();
-	p5.join(rand.nextInt(5)*10000);
         p6.start();
-	p6.join(rand.nextInt(5)*10000);
         p7.start();
-	p7.join(rand.nextInt(5)*10000);
         p8.start();
-	p8.join(rand.nextInt(5)*10000);
         p9.start();
-	p9.join(rand.nextInt(5)*10000);
         p10.start();
-	p10.join(rand.nextInt(5)*10000);
         Thread controllore = new Thread(read);
         controllore.start();
-	Thread.sleep(rand.nextInt(5)*10000);
+        if(controllore.getState()!=WAITING){
+            p1.interrupt();
+            p2.interrupt();
+            p3.interrupt();
+            p4.interrupt();
+            p5.interrupt();
+            p6.interrupt();
+            p7.interrupt();
+            p8.interrupt();
+            p9.interrupt();
+            p10.interrupt();
+        }
     }
 }
